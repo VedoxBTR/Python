@@ -1,9 +1,9 @@
 #!/bin/sh
 # wallpaper-selector.sh — selector Vanta Black + Pywal con PREVIEW
-# Modos: fuzzel (rápido sin preview), wofi (con preview img), rofi (grid con thumbnails), waypaper (GUI)
-# Uso: wallpaper-selector.sh [--fuzzel|--wofi|--rofi|--waypaper]
+# Modos: rofi (grid con thumbnails), wofi (con preview img), waypaper (GUI)
+# Uso: wallpaper-selector.sh [--rofi|--wofi|--waypaper] — default rofi
 
-MODE="${1:---fuzzel}"
+MODE="${1:---rofi}"
 WALL_DIR="$HOME/Wallpaper"
 ALT_DIR="$HOME/Pictures/Wallpapers"
 APPLY="$HOME/dotfiles/scripts/apply-colors.sh"
@@ -29,7 +29,7 @@ case "$MODE" in
       if command -v rofi >/dev/null 2>&1; then
         MODE="--rofi"
       else
-        MODE="--fuzzel"
+        MODE="--rofi"
       fi
     else
       # Wofi con preview: formato img:/path:text:basename
@@ -63,8 +63,8 @@ case "$MODE" in
   --rofi)
     # Rofi grid 3x3 con thumbnails (requiere rofi >=1.7 y theme wallpaper-selector)
     if ! command -v rofi >/dev/null 2>&1; then
-      notify-send "Rofi no instalado" "Usando fuzzel (sin preview)" -u low
-      MODE="--fuzzel"
+      notify-send "Rofi no instalado" "Usando rofi fallback" -u low
+      MODE="--rofi"
       exec "$0" "$MODE"
     else
       # Construir lista con icon injection: "label\0icon\x1f/path"
@@ -90,9 +90,8 @@ case "$MODE" in
     fi
     ;;
   *)
-    # Fuzzel dmenu (por defecto, ultra rápido pero SIN preview - fuzzel no soporta imágenes)
-    # Añadimos hint que wofi/rofi tienen preview
-    CHOICE=$(printf "%s\n" "$FILES" | xargs -I{} basename {} | fuzzel --dmenu --prompt="  wallpaper> " --placeholder="filtra · escribe 'wofi' o 'rofi' para preview · enter" --width 50 --lines 15 2>/dev/null)
+    # Rofi dmenu por defecto (rápido, con pywal) - fuzzel deprecado
+    CHOICE=$(printf "%s\n" "$FILES" | xargs -I{} basename {} | rofi -dmenu -i -p " wallpaper" -theme ~/.config/rofi/dmenu.rasi -l 15 2>/dev/null)
     ;;
 esac
 
@@ -118,7 +117,7 @@ FILE=$(printf "%s\n" "$FILES" | grep -F "/$CHOICE" | head -1)
 [ -z "$FILE" ] && notify-send "Wallpaper" "Archivo no encontrado: $CHOICE" -u critical && exit 1
 
 # Preguntar modo: Auto pywal vs Vanta Black puro vs solo wallpaper
-MODE_CHOICE=$(printf "auto (pywal + awww)\nvantablack (puro negro)\nsolo wallpaper (sin recolorear)\nwofi preview\nrofi grid" | fuzzel --dmenu --prompt="modo> " --placeholder="auto = pywal recolorea todo · vantablack = negro puro" --width 45 --lines 6 2>/dev/null)
+MODE_CHOICE=$(printf "auto (pywal + awww)\nvantablack (puro negro)\nsolo wallpaper (sin recolorear)\nwofi preview\nrofi grid" | rofi -dmenu -i -p "modo" -theme ~/.config/rofi/dmenu.rasi -l 6 2>/dev/null)
 
 # Si eligió ir a preview, re-lanzar selector en ese modo
 case "$MODE_CHOICE" in

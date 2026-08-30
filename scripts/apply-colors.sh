@@ -1,7 +1,7 @@
 #!/bin/sh
 # apply-colors.sh — wallbash con pywal + matugen
 # Uso: apply-colors.sh /ruta/a/wallpaper.jpg [--no-wallpaper] [--vantablack]
-# Genera colores y aplica a foot/waybar/mango/mako/fuzzel
+# Genera colores y aplica a foot/ghostty/waybar/mango/mako/rofi
 
 WALLPAPER="$1"
 MODE="${2:-auto}"  # auto | vantablack | pywal
@@ -98,7 +98,7 @@ text-color=#888888
 border-color=#1a1a1a
 MAKO
 
-  # Fuzzel
+  # Fuzzel (legacy, mantenido) y Rofi
   mkdir -p ~/.config/fuzzel
   cat > ~/.config/fuzzel/fuzzel.ini <<'FUZZEL'
 [main]
@@ -126,6 +126,39 @@ width=1
 radius=12
 selection-radius=8
 FUZZEL
+
+  # Rofi - Material by Thomaszal (fijo, no pywal) — preserva tema
+  # No sobrescribir dmenu/wallpaper-selector, se mantienen en material
+  echo "[apply-colors] Rofi en material (preservado)"
+
+  # Ghostty - Vanta Black puro (adaptado de foot vantablack)
+  mkdir -p ~/.config/ghostty
+  cat > ~/.config/ghostty/pywall.config <<'GHOSTTY'
+background = 000000
+foreground = e5e5e5
+cursor-color = e5e5e5
+selection-background = 1a1a1a
+selection-foreground = ffffff
+palette = 0=#000000
+palette = 1=#8c1d1d
+palette = 2=#4a5a3c
+palette = 3=#6b6b4a
+palette = 4=#2a4a6b
+palette = 5=#4a3a5a
+palette = 6=#3a5a5a
+palette = 7=#e5e5e5
+palette = 8=#333333
+palette = 9=#aa2a2a
+palette = 10=#6a7a5a
+palette = 11=#8a8a6a
+palette = 12=#3a6a9a
+palette = 13=#6a4a7a
+palette = 14=#4a7a7a
+palette = 15=#ffffff
+GHOSTTY
+  cp ~/.config/ghostty/pywall.config ~/.config/ghostty/pywal.conf 2>/dev/null
+  cp ~/.config/ghostty/pywall.config ~/.cache/wal/ghostty.conf 2>/dev/null
+  echo "[apply-colors] Ghostty vantablack listo (pywall.config + pywal.conf)"
 
   # Actualizar foot.ini para usar vantablack
   if ! grep -q "vantablack" ~/.config/foot/foot.ini; then
@@ -165,7 +198,7 @@ apply_pywal() {
       cat ~/.cache/wal/colors-mako > ~/.config/mako/config
     fi
   fi
-  # Fuzzel - pywal genera colors-fuzzel.ini? nuestro template es colors-fuzzel?
+  # Fuzzel - pywal genera colors-fuzzel.ini? nuestro template es colors-fuzzel? (legacy)
   if [ -f ~/.cache/wal/colors-fuzzel.ini ]; then
     mkdir -p ~/.config/fuzzel
     # Convertir pywal template a fuzzel.ini completo
@@ -181,6 +214,24 @@ anchor=center
 $(cat ~/.cache/wal/colors-fuzzel.ini)
 EOF
     fi
+  fi
+  # Rofi - Material by Thomaszal (fijo) — no sobrescribir con pywal
+  echo "[apply-colors] Rofi material preservado"
+
+  # Ghostty - pywal (sincroniza pywall.config y pywal.conf con cache generado por wal)
+  if [ -f ~/.cache/wal/ghostty.conf ]; then
+    mkdir -p ~/.config/ghostty
+    cp ~/.cache/wal/ghostty.conf ~/.config/ghostty/pywall.config 2>/dev/null
+    cp ~/.cache/wal/ghostty.conf ~/.config/ghostty/pywal.conf 2>/dev/null
+    echo "[apply-colors] Ghostty pywal sincronizado (pywall.config + pywal.conf)"
+  fi
+
+  # HyDE wall.quad / wall.sqre para fastfetch (ghostty)
+  if [ -f "$WALLPAPER" ]; then
+    mkdir -p ~/.cache/hyde
+    bash -c 'magick "$1" -strip -thumbnail 500x500^ -gravity center -extent 500x500 -quality 90 "$2"' -- "$WALLPAPER" ~/.cache/hyde/wall.sqre.png 2>/dev/null && mv ~/.cache/hyde/wall.sqre.png ~/.cache/hyde/wall.sqre 2>/dev/null
+    bash -c 'magick "$1" \( -size 500x500 xc:white -fill "rgba(0,0,0,0.7)" -draw "polygon 400,500 500,500 500,0 450,0" -fill black -draw "polygon 500,500 500,0 450,500" \) -alpha Off -compose CopyOpacity -composite "$2"' -- ~/.cache/hyde/wall.sqre ~/.cache/hyde/wall.quad.png 2>/dev/null && mv ~/.cache/hyde/wall.quad.png ~/.cache/hyde/wall.quad 2>/dev/null
+    echo "[apply-colors] HyDE wall.sqre/quad actualizado"
   fi
 
   # Mango colors ya generado como mango-colors.conf
@@ -207,11 +258,8 @@ EOF
     mkdir -p ~/.config/wofi
     cp ~/.cache/wal/wofi-style.css ~/.config/wofi/style.css
   fi
-  # Rofi wallpaper selector - grid con preview
-  if [ -f ~/.cache/wal/rofi-wallpaper-selector.rasi ]; then
-    mkdir -p ~/.config/rofi
-    cp ~/.cache/wal/rofi-wallpaper-selector.rasi ~/.config/rofi/wallpaper-selector.rasi
-  fi
+  # Rofi wallpaper selector - Material grid (fijo)
+  echo "[apply-colors] Rofi wallpaper-selector material preservado"
 
   # Matugen adicional para material (opcional)
   if command -v matugen >/dev/null 2>&1; then

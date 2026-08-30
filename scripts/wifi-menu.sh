@@ -1,5 +1,5 @@
 #!/bin/sh
-# wifi-menu.sh — optimizado anti-freeze (Vanta Black + fuzzel)
+# wifi-menu.sh — optimizado anti-freeze (Vanta Black + rofi)
 # FIX: antes usaba --rescan yes 2 veces bloqueando 5-10s. Ahora usa --rescan no instantáneo.
 # Solo hace rescan real al pulsar [Rescan] o si la cache está vacía. Rescan va en background.
 
@@ -85,8 +85,8 @@ printf "%s\n" "$LIST" | while IFS=: read -r INUSE SSID SIGNAL SEC FREQ; do
   printf "%s|%s\n" "$DISP" "$SSID" >> "$MAP"
 done
 
-# Llamada fuzzel directa (antes usaba $FUZZEL="..." truco frágil)
-CHOICE=$(fuzzel --dmenu --width 55 --lines 14 --prompt="󰖩  wifi> " --placeholder="filtra SSID, enter para conectar" < "$TMP" 2>/dev/null)
+# Llamada rofi directa (reemplazo fuzzel)
+CHOICE=$(rofi -dmenu -i -p "󰖩 wifi" -theme ~/.config/rofi/dmenu.rasi -l 14 < "$TMP" 2>/dev/null)
 [ -z "$CHOICE" ] && exit 0
 
 case "$CHOICE" in
@@ -142,7 +142,7 @@ if nmcli connection show 2>/dev/null | grep -q "^${REAL_SSID} "; then
 else
   SEC=$(printf "%s\n" "$LIST" | grep -F ":${REAL_SSID}:" | cut -d: -f4 | head -1)
   if echo "$SEC" | grep -q "WPA\|WEP"; then
-    PASS=$(printf "" | fuzzel --dmenu --prompt="󰌾  password> " --placeholder="contraseña para $REAL_SSID" --password --width 45 --lines 1 2>/dev/null)
+    PASS=$(printf "" | rofi -dmenu -password -p "󰌾 password" -theme ~/.config/rofi/dmenu.rasi -l 1 2>/dev/null)
     [ -z "$PASS" ] && exit 0
     notify-send "Wi-Fi" "Conectando a $REAL_SSID..." 2>/dev/null
     if timeout 15 nmcli device wifi connect "$REAL_SSID" password "$PASS" 2>/dev/null; then
