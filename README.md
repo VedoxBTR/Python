@@ -49,3 +49,4 @@ dotfiles/
 ## Rollback
 Restaurar backups en `~/backups/noctalia-2026-08-29/` y
 `/etc/greetd/config.toml.pre-noctalia`, reinstalar noctalia.
+# Python
