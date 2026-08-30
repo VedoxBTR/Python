@@ -5,28 +5,24 @@ herramientas wlroots independientes que corren idénticas en **mango** (mangowm)
 y **niri** (ambos compositores wlroots).
 
 ## Componentes (compositor-agnósticos)
-| Función        | App            | Estado        |
-|----------------|----------------|---------------|
-| Barra          | `waybar`       | instalado     |
-| Launcher       | `fuzzel`       | por instalar  |
-| Notificaciones | `mako`         | por instalar  |
-| Lock           | `swaylock`     | instalado     |
-| Idle/lock      | `swayidle`     | por instalar  |
-| Clipboard      | `cliphist`+`wl-clipboard` | instalados |
-| Wallpaper      | `swww`         | instalado     |
-| Screenshots    | `grim`+`slurp` | por instalar  |
-| Greeter        | `greetd-tuigreet` (bin `tuigreet`) | por instalar  |
-| Polkit agent   | `polkit-gnome` | por instalar  |
+| Función        | App            | Estado 2026-08-29 |
+|----------------|----------------|-------------------|
+| Barra          | `waybar`       | ✅ instalado + linkeado |
+| Launcher       | `fuzzel`       | ✅ instalado + linkeado |
+| Notificaciones | `mako`         | ✅ instalado + linkeado |
+| Lock           | `swaylock`     | ✅ instalado |
+| Idle/lock      | `swayidle`     | ✅ instalado |
+| Clipboard      | `cliphist`+`wl-clipboard` | ✅ instalados |
+| Wallpaper      | `awww` (provee `swww`) | ✅ instalado |
+| Screenshots    | `grim`+`slurp` | ✅ instalados |
+| Greeter        | `greetd-tuigreet` (bin `tuigreet`) | ✅ activo |
+| Polkit agent   | `polkit-kde` | ✅ (fallback en start-common.sh) |
 
-## Instalar (requiere sudo — hacer cuando vuelvas / haya huella)
+## Instalación ya completada
+```bash
+sudo pacman -S mako fuzzel swayidle greetd-tuigreet grim slurp awww --needed
+# awww provee swww - el binario real es /usr/bin/awww
 ```
-sudo pacman -S mako fuzzel swayidle greetd-tuigreet grim slurp
-```
-> El paquete es `greetd-tuigreet`; el binario resultante es `/usr/bin/tuigreet`
-> (la config de greetd usa `/usr/bin/tuigreet`).
-> Nota: el agente polkit ya está cubierto por `polkit-kde-authentication-agent-1`
-> (presente). `start-common.sh` lo reusará; no hace falta instalar `polkit-gnome`.
-> Si prefieres un agente sin dependencias KDE, instala `polkit-gnome` y listo.
 
 ## Estructura
 ```
@@ -41,17 +37,14 @@ dotfiles/
 └── compositors/              # snippets de binds para mango y niri
 ```
 
-## Activar (cuando estés de vuelta y con sudo)
-1. `chmod +x scripts/start-common.sh`
-2. Symlink de sesiones:
-   `sudo ln -sf ~/dotfiles/sessions/mango.desktop /usr/share/wayland-sessions/`
-   `sudo ln -sf ~/dotfiles/sessions/niri.desktop /usr/share/wayland-sessions/`
-3. Cambiar greeter en greetd a tuigreet (ver `Plan quitar noctalia.md`):
-   `/etc/greetd/config.toml` → `command = "tuigreet --greetd --asterisk --remember"`
-4. Quitar `exec-once=noctalia` y los binds de noctalia en
-   `~/.config/mango/config.conf` (ver `compositors/mango-bindings.md`).
-5. Probar en una VT alterna antes de reiniciar.
-6. Solo tras confirmar login: `sudo pacman -Rns noctalia noctalia-greeter`.
+## Activar (completado 2026-08-29 con Kira)
+1. ✅ `chmod +x scripts/start-common.sh` + fix `awww`/`swww` y typo `wallpaper.sh`
+2. ✅ Symlink de sesiones: `/usr/share/wayland-sessions/mango.desktop` y `niri.desktop`
+3. ✅ `greetd` ya en `tuigreet --time --remember --remember-session --asterisks`
+4. ✅ Symlinks `~/.config/waybar|mako|fuzzel|swaylock → ~/dotfiles/*`
+5. ✅ `~/.config/niri/config.kdl` limpio (quitado `hypridle` noctalia, usa `swayidle` de start-common.sh)
+6. ✅ `~/.config/mango/config.conf` ya sin binds noctalia (fuzzel/power-menu/wallpaper)
+7. Próximo: probar en VT y luego `sudo pacman -Rns noctalia noctalia-greeter`
 
 ## Rollback
 Restaurar backups en `~/backups/noctalia-2026-08-29/` y
