@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Mango (dotfiles)
+Comment=Sesión wlroots mínima con dotfiles propios
+Exec=/home/alexo/dotfiles/scripts/start-common.sh mango
+Type=Application
+DesktopNames=wlroots

@@ -1,0 +1,25 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 24,
+  "modules-left": ["idle_inhibitor"],
+  "modules-center": ["clock"],
+  "modules-right": ["network", "pulseaudio", "battery", "tray"],
+  "clock": {
+    "format": "{:%H:%M  %a %d/%m}"
+  },
+  "network": {
+    "format": "{essid}"
+  },
+  "pulseaudio": {
+    "format": "{volume}%",
+    "format-muted": "muted"
+  },
+  "battery": {
+    "format": "{capacity}%",
+    "format-icons": ["", "", "", "", ""]
+  },
+  "idle_inhibitor": {
+    "format": "{status}"
+  }
+}
