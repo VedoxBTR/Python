@@ -53,9 +53,18 @@ elif [ -x /usr/lib/polkit-kde-authentication-agent-1 ]; then
   /usr/lib/polkit-kde-authentication-agent-1 >>"$LOG" 2>&1 &
 fi
 
-# Barra
+# Esperar estabilizacion del compositor (evita cannot open display)
+sleep 1.5
+
+# Barra - con reintento
 waybar >>"$LOG" 2>&1 &
 log "waybar lanzado (pid $!)"
+sleep 2
+if ! pgrep -x waybar >/dev/null 2>&1; then
+  log "waybar no iniciado, reintentando..."
+  waybar >>"$LOG" 2>&1 &
+  log "waybar reintento (pid $!)"
+fi
 
 # Notificaciones
 mako >>"$LOG" 2>&1 &
@@ -69,13 +78,24 @@ log "cliphist lanzado (pid $!)"
 swayidle -w timeout 300 'swaylock -f' >>"$LOG" 2>&1 &
 log "swayidle lanzado (pid $!)"
 
-# Wallpaper (requiere un archivo en WALLPAPER o $HOME/.config/dotfiles/wallpaper.png)
-# Nota: el paquete Arch es awww (bin awww) que provee swww
-_wallpaper_cmd="swww"
-command -v awww >/dev/null 2>&1 && _wallpaper_cmd="awww"
+# Wallpaper (awww = fork de swww, daemon es awww-daemon)
 if [ -f "$WALLPAPER" ]; then
-  $_wallpaper_cmd init >>"$LOG" 2>&1 && $_wallpaper_cmd img "$WALLPAPER" >>"$LOG" 2>&1 &
-  log "$_wallpaper_cmd lanzado con $WALLPAPER"
+  if command -v awww >/dev/null 2>&1; then
+    if ! pgrep -x awww-daemon >/dev/null 2>&1; then
+      awww-daemon >>"$LOG" 2>&1 &
+      log "awww-daemon lanzado (pid $!)"
+      sleep 0.8
+    fi
+    awww img "$WALLPAPER" >>"$LOG" 2>&1 &
+    log "awww img lanzado con $WALLPAPER (pid $!)"
+  elif command -v swww >/dev/null 2>&1; then
+    swww init >>"$LOG" 2>&1 &
+    sleep 0.5
+    swww img "$WALLPAPER" >>"$LOG" 2>&1 &
+    log "swww lanzado con $WALLPAPER"
+  else
+    log "ERROR: ni awww ni swww encontrados, sin wallpaper"
+  fi
 else
   log "WALLPAPER no encontrado ($WALLPAPER): se omite el fondo."
 fi

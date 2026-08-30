@@ -1,25 +1,72 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 24,
-  "modules-left": ["idle_inhibitor"],
+  "height": 34,
+  "spacing": 3,
+  "modules-left": ["ext/workspaces", "idle_inhibitor"],
   "modules-center": ["clock"],
-  "modules-right": ["network", "pulseaudio", "battery", "tray"],
+  "modules-right": ["network", "pulseaudio", "battery", "tray", "custom/power"],
+  "ext/workspaces": {
+    "format": "{name}",
+    "format-icons": {
+      "active": "",
+      "default": "",
+      "urgent": ""
+    }
+  },
   "clock": {
-    "format": "{:%H:%M  %a %d/%m}"
+    "format": "{:%a %d %b  󰥔 %H:%M}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format-alt": "{:%Y-%m-%d %H:%M}"
   },
   "network": {
-    "format": "{essid}"
+    "format-wifi": "  {essid}",
+    "format-ethernet": "󰈀 {ipaddr}",
+    "format-disconnected": "󰖪 offline",
+    "tooltip-format": "{essid} ({signalStrength}%) {ifname} via {gwaddr}\n{bandwidthDownBits} ↓ {bandwidthUpBits} ↑",
+    "on-click-right": "foot -e nmtui",
+    "on-click": "~/dotfiles/scripts/wifi-menu.sh"
   },
   "pulseaudio": {
-    "format": "{volume}%",
-    "format-muted": "muted"
+    "format": "{icon} {volume}%",
+    "format-muted": "󰝟 muted",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "󰋎",
+      "headset": "󰋎",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["", "", ""]
+    },
+    "on-click": "pavucontrol",
+    "scroll-step": 5
   },
   "battery": {
-    "format": "{capacity}%",
-    "format-icons": ["", "", "", "", ""]
+    "format": "{icon} {capacity}%",
+    "format-icons": ["", "", "", "", ""],
+    "format-charging": "󰂄 {capacity}%",
+    "format-plugged": "󰂄 {capacity}%",
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
+    "tooltip-format": "{timeTo} - {power:.1f}W"
   },
   "idle_inhibitor": {
-    "format": "{status}"
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "󰅶",
+      "deactivated": "󰾪"
+    },
+    "tooltip": true
+  },
+  "tray": {
+    "spacing": 8
+  },
+  "custom/power": {
+    "format": "",
+    "tooltip": false,
+    "on-click": "~/dotfiles/scripts/power-menu.sh"
   }
 }

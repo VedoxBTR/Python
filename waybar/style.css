@@ -1,29 +1,50 @@
+/* Pywal Vantablack-transparent - fixed full recolor + subir waybar */
 * {
   border: none;
   border-radius: 0;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 12px;
   min-height: 0;
 }
-
 window#waybar {
-  background-color: #1e1e2e;
-  color: #cdd6f4;
-  border-bottom: 2px solid #89b4fa;
+  background: transparent;
+  color: #c3c2c5;
+  margin: 2px 12px 0 12px;
 }
-
-#clock,
-#network,
-#pulseaudio,
-#battery,
-#idle_inhibitor,
-#tray {
-  padding: 0 8px;
+/* Todos los módulos con fondo pywal tintado - antes faltaba #idle_inhibitor y solo mitad se pintaba */
+#workspaces, #clock, #network, #pulseaudio, #battery, #tray, #custom-power, #idle_inhibitor {
+  background: alpha(#120b1a, 0.78);
+  border: 1px solid alpha(#625a6f, 0.35);
+  border-radius: 10px;
+  padding: 4px 12px;
+  margin: 2px 3px;
+  color: #c3c2c5;
 }
-
-#battery.warning {
-  color: #f9e2af;
+#workspaces {
+  padding: 0 4px;
+  background: alpha(#120b1a, 0.85);
 }
-#battery.critical {
-  color: #f38ba8;
+#workspaces button {
+  color: #625a6f;
+  background: transparent;
+  border-radius: 8px;
+  padding: 2px 10px;
+  margin: 3px 2px;
+}
+#workspaces button.active {
+  background: #BF35CB;
+  color: #120b1a;
+}
+#workspaces button.occupied { color: #c3c2c5; }
+#clock {
+  background: alpha(#120b1a, 0.85);
+  color: #BF35CB;
+  font-weight: 600;
+}
+#network.disconnected, #battery.critical { color: #7D5FC3; }
+#battery.charging { color: #7D62C6; }
+tooltip {
+  background: #120b1a;
+  border: 1px solid #625a6f;
+  border-radius: 8px;
 }
